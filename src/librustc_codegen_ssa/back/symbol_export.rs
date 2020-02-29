@@ -182,6 +182,12 @@ fn exported_symbols_provider_local(
         symbols.push((exported_symbol, SymbolExportLevel::C));
     }
 
+    if tcx.is_panic_runtime(LOCAL_CRATE) && tcx.sess.target.target.options.custom_unwind_resume {
+        let exported_symbol = ExportedSymbol::NoDefId(SymbolName::new("rust_eh_unwind_resume"));
+
+        symbols.push((exported_symbol, SymbolExportLevel::Rust));
+    }
+
     if tcx.allocator_kind().is_some() {
         for method in ALLOCATOR_METHODS {
             let symbol_name = format!("__rust_{}", method.name);

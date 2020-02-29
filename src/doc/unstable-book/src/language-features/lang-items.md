@@ -52,7 +52,6 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 
 #[lang = "eh_personality"] extern fn rust_eh_personality() {}
 #[lang = "panic_impl"] extern fn rust_begin_panic(info: &PanicInfo) -> ! { unsafe { intrinsics::abort() } }
-#[lang = "eh_unwind_resume"] extern fn rust_eh_unwind_resume() {}
 #[no_mangle] pub extern fn rust_eh_register_frames () {}
 #[no_mangle] pub extern fn rust_eh_unregister_frames () {}
 ```
@@ -67,7 +66,7 @@ Other features provided by lang items include:
   marked with lang items; those specific four are `eq`, `ord`,
   `deref`, and `add` respectively.
 - stack unwinding and general failure; the `eh_personality`,
-  `eh_unwind_resume`, `fail` and `fail_bounds_checks` lang items.
+  `fail` and `fail_bounds_checks` lang items.
 - the traits in `std::marker` used to indicate types of
   various kinds; lang items `send`, `sync` and `copy`.
 - the marker types and variance indicators found in
@@ -130,12 +129,6 @@ fn start(_argc: isize, _argv: *const *const u8) -> isize {
 pub extern fn rust_eh_personality() {
 }
 
-// This function may be needed based on the compilation target.
-#[lang = "eh_unwind_resume"]
-#[no_mangle]
-pub extern fn rust_eh_unwind_resume() {
-}
-
 #[lang = "panic_impl"]
 #[no_mangle]
 pub extern fn rust_begin_panic(info: &PanicInfo) -> ! {
@@ -173,12 +166,6 @@ pub extern fn main(_argc: i32, _argv: *const *const u8) -> i32 {
 pub extern fn rust_eh_personality() {
 }
 
-// This function may be needed based on the compilation target.
-#[lang = "eh_unwind_resume"]
-#[no_mangle]
-pub extern fn rust_eh_unwind_resume() {
-}
-
 #[lang = "panic_impl"]
 #[no_mangle]
 pub extern fn rust_begin_panic(info: &PanicInfo) -> ! {
@@ -213,8 +200,8 @@ the screen. While the language item's name is `panic_impl`, the symbol name is
 
 A third function, `rust_eh_unwind_resume`, is also needed if the `custom_unwind_resume`
 flag is set in the options of the compilation target. It allows customizing the
-process of resuming unwind at the end of the landing pads. The language item's name
-is `eh_unwind_resume`.
+process of resuming unwind at the end of the landing pads. Since this function
+must be defined in assembly code it does not have an associated language item.
 
 ## List of all language items
 
@@ -247,9 +234,8 @@ the source code.
   - `eh_personality`: `libpanic_unwind/emcc.rs` (EMCC)
   - `eh_personality`: `libpanic_unwind/gcc.rs` (GNU)
   - `eh_personality`: `libpanic_unwind/seh.rs` (SEH)
-  - `eh_unwind_resume`: `libpanic_unwind/gcc.rs` (GCC)
-  - `eh_catch_typeinfo`: `libpanic_unwind/seh.rs` (SEH)
   - `eh_catch_typeinfo`: `libpanic_unwind/emcc.rs` (EMCC)
+  - `rust_eh_unwind_resume`: `libpanic_unwind/gcc.rs` (GCC)
   - `panic`: `libcore/panicking.rs`
   - `panic_bounds_check`: `libcore/panicking.rs`
   - `panic_impl`: `libcore/panicking.rs`
