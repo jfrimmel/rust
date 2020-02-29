@@ -695,7 +695,7 @@ pub struct TargetOptions {
     /// Whether the target uses a custom unwind resumption routine.
     /// By default LLVM lowers `resume` instructions into calls to `_Unwind_Resume`
     /// defined in libgcc. If this option is enabled, the target must provide
-    /// `eh_unwind_resume` lang item.
+    /// a `rust_eh_unwind_resume` symbol.
     pub custom_unwind_resume: bool,
     /// Whether the runtime startup code requires the `main` function be passed
     /// `argc` and `argv` values.
